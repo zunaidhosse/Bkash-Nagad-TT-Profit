@@ -1,0 +1,21 @@
+const manifest = {
+  "name": "রেমিটেন্স লাভ ক্যালকুলেটর",
+  "short_name": "লাভ হিসাব",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#4f46e5",
+  "description": "সৌদি রিয়াল থেকে বাংলাদেশি টাকায় আপনার রেমিটেন্সের লাভ সহজে হিসাব করুন।",
+  "icons": [
+    {
+      "src": "icon-192x192.png", // পাথ পরিবর্তন করা হয়েছে
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png", // পাথ পরিবর্তন করা হয়েছে
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+};
