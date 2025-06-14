@@ -3,152 +3,238 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#4f46e5"/>
+  <meta name="description" content="সৌদি রিয়াল থেকে বাংলাদেশি টাকায় আপনার রেমিটেন্সের লাভ সহজে হিসাব করুন।">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="images/icon-192x192.png">
+
   <title>রেমিটেন্স লাভ ক্যালকুলেটর</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* Custom font for the app */
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
     }
-
-    html, body {
-      height: 100%;
-      background: #000000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', sans-serif;
+    /* Custom style for input number arrows */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
     }
-
-    .border-wrapper {
-      background: #f1f3f6;
-      border-radius: 20px;
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 0 8px #3f51b533, 0 0 20px rgba(255,255,255,0.1);
+    input[type=number] {
+      -moz-appearance: textfield;
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #333;
+    /* Simple fade-in animation */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
     }
-
-    label {
-      font-weight: bold;
-      color: #555;
-      margin-top: 10px;
-      display: block;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin: 8px 0 18px 0;
-      font-size: 16px;
-      border: none;
-      border-radius: 15px;
-      background: #f1f3f6;
-      box-shadow: inset 6px 6px 12px #d1d9e6,
-                  inset -6px -6px 12px #ffffff;
-      outline: none;
-    }
-
-    .output-box {
-      background: #f1f3f6;
-      box-shadow: inset 6px 6px 12px #d1d9e6,
-                  inset -6px -6px 12px #ffffff;
-      padding: 14px;
-      border-radius: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .icon-btn {
-      width: 45px;
-      height: 45px;
-      background: #f1f3f6;
-      border-radius: 50%;
-      box-shadow: 5px 5px 10px #d1d9e6,
-                  -5px -5px 10px #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 20px;
-      color: #444;
-      margin-top: 10px;
-    }
-
-    .divider-box {
-      display: none;
-      margin-top: 20px;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
     @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-<body>
-  <div class="border-wrapper">
-    <h2>রেমিটেন্স লাভ ক্যালকুলেটর</h2>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 min-h-screen flex items-center justify-center p-4">
 
-    <label for="riyals">কত রিয়াল পাঠাবেন:</label>
-    <input type="number" id="riyals" placeholder="যেমনঃ 1000" oninput="calculateProfit()">
+  <div class="w-full max-w-md mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 md:p-8">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">রেমিটেন্স লাভ ক্যালকুলেটর</h1>
+      <p class="text-gray-500 mt-2">আপনার সম্ভাব্য লাভ সহজেই হিসাব করুন</p>
+    </div>
 
-    <label for="profitPerRiyal">প্রতি রিয়ালে লাভ (পয়সা):</label>
-    <input type="number" id="profitPerRiyal" placeholder="যেমনঃ ৮" step="0.01" oninput="calculateProfit()">
+    <!-- Calculator Form -->
+    <div class="space-y-6">
+      <div>
+        <label for="riyals" class="text-sm font-semibold text-gray-600 mb-2 block">কত রিয়াল পাঠাবেন (SAR)</label>
+        <div class="relative">
+          <input type="number" id="riyals" placeholder="যেমন: ১০০০" class="w-full pl-4 pr-12 py-3 bg-gray-100 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-lg text-lg text-gray-700 outline-none transition duration-300">
+          <span class="absolute inset-y-0 right-4 flex items-center text-gray-400">SAR</span>
+        </div>
+      </div>
+      
+      <div>
+        <label for="profitPerRiyal" class="text-sm font-semibold text-gray-600 mb-2 block">প্রতি রিয়ালে লাভ (পয়সা)</label>
+         <div class="relative">
+            <input type="number" id="profitPerRiyal" placeholder="যেমন: ৮" step="0.01" class="w-full pl-4 pr-12 py-3 bg-gray-100 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-lg text-lg text-gray-700 outline-none transition duration-300">
+            <span class="absolute inset-y-0 right-4 flex items-center text-gray-400">পয়সা</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Result Display -->
+    <div class="mt-8 text-center bg-indigo-600 text-white rounded-xl p-6 shadow-indigo-200 shadow-md">
+      <p class="text-lg opacity-80">আপনার মোট লাভ</p>
+      <p id="totalProfit" class="text-4xl font-bold tracking-tight">০.০০ টাকা</p>
+    </div>
 
-    <label>মোট লাভ (টাকায়):</label>
-    <div class="output-box" id="totalProfit">0 টাকা</div>
-
-    <!-- ডান পাশে আইকন বাটন -->
-    <div style="display: flex; justify-content: flex-end;">
-      <div class="icon-btn" onclick="toggleDividerBox()" title="ভাগ করুন">
-        &#x2630;
+    <!-- Divider Toggle Button -->
+    <div class="text-center mt-6">
+        <button id="toggleButton" class="flex items-center justify-center gap-2 mx-auto text-sm text-gray-600 hover:text-indigo-700 font-semibold transition">
+            <span>ভাগ করে দেখুন</span>
+            <svg id="toggleIcon" class="w-4 h-4 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Divider Box (Initially hidden) -->
+    <div id="dividerBox" class="hidden mt-6 pt-6 border-t border-gray-200">
+      <div class="space-y-4">
+        <div>
+            <label for="divider" class="text-sm font-semibold text-gray-600 mb-2 block">কত জনের মধ্যে ভাগ করবেন?</label>
+            <input type="number" id="divider" placeholder="যেমন: ২" class="w-full p-3 bg-gray-100 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-lg text-lg text-gray-700 outline-none transition duration-300">
+        </div>
+        <div class="bg-gray-100 rounded-lg p-4 text-center">
+            <p class="text-md text-gray-600">প্রত্যেকে পাবে</p>
+            <p id="sharedProfit" class="text-2xl font-bold text-indigo-700">০.০০ টাকা</p>
+        </div>
       </div>
     </div>
 
-    <!-- ভাগ করার বক্স -->
-    <div class="divider-box" id="dividerBox">
-      <label for="divider">আজকের রেট?</label>
-      <input type="number" id="divider" placeholder="যেমনঃ 2" oninput="calculateShare()">
-      <div class="output-box" id="sharedProfit">আজকের লাভ: 0 SAR</div>
-    </div>
   </div>
 
   <script>
+    // --- Element Selection ---
+    const riyalsInput = document.getElementById('riyals');
+    const profitPerRiyalInput = document.getElementById('profitPerRiyal');
+    const dividerInput = document.getElementById('divider');
+    const totalProfitDisplay = document.getElementById('totalProfit');
+    const sharedProfitDisplay = document.getElementById('sharedProfit');
+    const toggleButton = document.getElementById('toggleButton');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const dividerBox = document.getElementById('dividerBox');
+
     let totalTaka = 0;
 
+    // --- Core Calculation Functions ---
     function calculateProfit() {
-      const riyals = parseFloat(document.getElementById('riyals').value) || 0;
-      const profitPoisha = parseFloat(document.getElementById('profitPerRiyal').value) || 0;
+      const riyals = parseFloat(riyalsInput.value) || 0;
+      const profitPoisha = parseFloat(profitPerRiyalInput.value) || 0;
+      
       totalTaka = (riyals * profitPoisha) / 100;
-      document.getElementById('totalProfit').innerText = totalTaka.toFixed(2) + " টাকা";
+      totalProfitDisplay.innerText = totalTaka.toLocaleString('bn-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " টাকা";
+      
+      // Also update the shared profit when the main values change
       calculateShare();
     }
 
-    function toggleDividerBox() {
-      const box = document.getElementById('dividerBox');
-      box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
+    function calculateShare() {
+      const divider = parseFloat(dividerInput.value) || 0;
+      const sharedProfit = divider > 0 ? (totalTaka / divider) : 0;
+      
+      sharedProfitDisplay.innerText = sharedProfit.toLocaleString('bn-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " টাকা";
     }
 
-    function calculateShare() {
-      const divider = parseFloat(document.getElementById('divider').value) || 0;
-      const sharedProfit = divider > 0 ? (totalTaka / divider) : 0;
-      document.getElementById('sharedProfit').innerText = "আজকের লাভ: " + sharedProfit.toFixed(2) + " SAR";
+    // --- Event Listeners ---
+    riyalsInput.addEventListener('input', calculateProfit);
+    profitPerRiyalInput.addEventListener('input', calculateProfit);
+    dividerInput.addEventListener('input', calculateShare);
+
+    toggleButton.addEventListener('click', () => {
+        const isHidden = dividerBox.classList.contains('hidden');
+        if (isHidden) {
+            dividerBox.classList.remove('hidden');
+            dividerBox.classList.add('fade-in');
+            toggleIcon.style.transform = 'rotate(180deg)';
+        } else {
+            dividerBox.classList.add('hidden');
+            toggleIcon.style.transform = 'rotate(0deg)';
+        }
+    });
+
+    // --- PWA Service Worker Registration ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('Service Worker registered successfully:', registration);
+          })
+          .catch(error => {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
     }
+
+    // --- Create manifest.json dynamically ---
+    const manifest = {
+      "name": "রেমিটেন্স লাভ ক্যালকুলেটর",
+      "short_name": "লাভ হিসাব",
+      "start_url": ".",
+      "display": "standalone",
+      "background_color": "#f1f5f9",
+      "theme_color": "#4f46e5",
+      "description": "সৌদি রিয়াল থেকে বাংলাদেশি টাকায় আপনার রেমিটেন্সের লাভ সহজে হিসাব করুন।",
+      "icons": [
+        {
+          "src": "images/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        },
+        {
+          "src": "images/icon-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    };
+
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(blob);
+    document.querySelector('link[rel="manifest"]').setAttribute('href', manifestURL);
+    
+    // --- Note for user ---
+    // For this PWA to work, you need to create two more files in the same directory:
+    // 1. A file named 'sw.js' (service worker)
+    // 2. A folder named 'images' with 'icon-192x192.png' and 'icon-512x512.png' inside.
+    // You can generate these icons from any image using an online PWA icon generator.
+    
+    // The content for 'sw.js' should be:
+    /*
+        const CACHE_NAME = 'remittance-calculator-v1';
+        const urlsToCache = [
+          '/',
+          '/index.html',
+          'https://cdn.tailwindcss.com',
+          'https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap'
+        ];
+
+        self.addEventListener('install', event => {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(urlsToCache);
+              })
+          );
+        });
+
+        self.addEventListener('fetch', event => {
+          event.respondWith(
+            caches.match(event.request)
+              .then(response => {
+                if (response) {
+                  return response;
+                }
+                return fetch(event.request);
+              }
+            )
+          );
+        });
+    */
+
   </script>
 </body>
-</html>>
-</body>
-</html>>
-</html>>
 </html>
+
