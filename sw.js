@@ -1,47 +1,65 @@
-// ক্যাশের নাম এবং ক্যাশে রাখার জন্য ফাইলের তালিকা
-const CACHE_NAME = 'bkash-nagad-profit-v1';
+// ক্যাশের নতুন ভার্সন এবং রিপোজিটরির নাম
+const CACHE_NAME = 'bkash-nagad-profit-v2';
+const GITHUB_REPO_NAME = '/Bkash-Nagad-TT-Profit';
+
+// ক্যাশে রাখার জন্য ফাইলের সঠিক তালিকা
 const urlsToCache = [
-  '/',
-  'index.html',
-  'manifest.json',
-  'icon-192x192.png',
-  'icon-512x512.png',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap'
+  `${GITHUB_REPO_NAME}/`,
+  `${GITHUB_REPO_NAME}/index.html`,
+  `${GITHUB_REPO_NAME}/manifest.json`,
+  `${GITHUB_REPO_NAME}/icon-192x192.png`,
+  `${GITHUB_REPO_NAME}/icon-512x512.png`
 ];
 
-// --- ইনস্টল ইভেন্ট ---
-// সার্ভিস ওয়ার্কার ইনস্টল হওয়ার সময় এই কোডটি রান হবে
+// সার্ভিস ওয়ার্কার ইনস্টল করা
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache and caching files');
         return cache.addAll(urlsToCache);
+      })
+      .catch(error => {
+        console.error('Failed to cache files:', error);
       })
   );
 });
 
-// --- ফেচ ইভেন্ট ---
-// অ্যাপ যখন কোনো ফাইল বা ডেটার জন্য রিকোয়েস্ট পাঠাবে, তখন এই কোডটি রান হবে
+// কন্টেন্ট ফেচ করা
 self.addEventListener('fetch', event => {
+  // শুধুমাত্র GET রিকোয়েস্ট হ্যান্ডেল করা হবে
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // নেটওয়ার্ক-ফার্স্ট স্ট্র্যাটেজি ব্যবহার করা
   event.respondWith(
-    // প্রথমে ক্যাশে খোঁজা হবে রিকোয়েস্ট করা ফাইলটি আছে কিনা
-    caches.match(event.request)
-      .then(response => {
-        // যদি ক্যাশে পাওয়া যায়, তবে সেখান থেকেই দেওয়া হবে
-        if (response) {
-          return response;
+    fetch(event.request)
+      .then(networkResponse => {
+        // সফলভাবে নেটওয়ার্ক থেকে পেলে, ক্যাশে সেভ করে রাখা
+        if (networkResponse) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              // শুধুমাত্র নিজের ডোমেইনের রিসোর্স ক্যাশ করা হবে
+              if (event.request.url.startsWith(self.location.origin)) {
+                cache.put(event.request, responseToCache);
+              }
+            });
         }
-        // যদি ক্যাশে না পাওয়া যায়, তবে নেটওয়ার্ক থেকে আনা হবে
-        return fetch(event.request);
-      }
-    )
+        return networkResponse;
+      })
+      .catch(() => {
+        // নেটওয়ার্ক ফেইল করলে, ক্যাশ থেকে দেখানোর চেষ্টা করা
+        return caches.match(event.request)
+          .then(cachedResponse => {
+            return cachedResponse || caches.match(`${GITHUB_REPO_NAME}/index.html`);
+          });
+      })
   );
 });
 
-// --- অ্যাক্টিভেট ইভেন্ট ---
-// নতুন সার্ভিস ওয়ার্কার অ্যাক্টিভেট হওয়ার সময় পুরনো ক্যাশে পরিষ্কার করা
+// পুরনো ক্যাশ মুছে ফেলা
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -49,6 +67,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
